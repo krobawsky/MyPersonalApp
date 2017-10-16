@@ -31,5 +31,6 @@ dependencies {
     compile 'com.github.satyan:sugar:1.5'
     compile 'de.hdodenhof:circleimageview:2.2.0'
     compile 'com.android.support:support-v4:26.+'
+    compile 'com.52inc:scoops:1.0.0'
     testCompile 'junit:junit:4.12'
 }

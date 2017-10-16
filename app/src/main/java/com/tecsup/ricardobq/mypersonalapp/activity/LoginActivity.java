@@ -1,9 +1,10 @@
 package com.tecsup.ricardobq.mypersonalapp.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,14 +13,8 @@ import android.widget.Toast;
 import com.tecsup.ricardobq.mypersonalapp.R;
 import com.tecsup.ricardobq.mypersonalapp.datos.User;
 import com.tecsup.ricardobq.mypersonalapp.datos.UserRepository;
-import com.tecsup.ricardobq.mypersonalapp.helper.SessionManager;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -28,7 +23,9 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnLogin;
     private Button btnLinkToRegister;
 
-    private SessionManager session;
+
+    // SharedPreferences
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,18 +38,22 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnLinkToRegister = (Button) findViewById(R.id.btnLinkToRegisterScreen);
 
-        // Session manager
-        //session = new SessionManager(getApplicationContext());
+        // init SharedPreferences
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        // Check if user is already logged in or not
-        /*
-        if (session.isLoggedIn()) {
-            // User is already logged in. Take him to main activity
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+        // username remember
+        String username = sharedPreferences.getString("username", null);
+        if(username != null){
+            inputUser.setText(username);
+            inputPass.requestFocus();
         }
-        */
+
+        // islogged remember
+        if(sharedPreferences.getBoolean("islogged", false)){
+            // Go to Dashboard
+            goDashboard();
+        }
+
 
         // Login button Click Event
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -98,19 +99,19 @@ public class LoginActivity extends AppCompatActivity {
 
                 String usern = user.getUsername();
                 String name = user.getName();
-                int phone = user.getPhone();
 
                 Toast.makeText(this, "Bienvenido "+ name, Toast.LENGTH_SHORT).show();
 
-                //session.setLogin(true);
 
-                // Launch main activity
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra("user", usern);
-                intent.putExtra("name", name);
-                intent.putExtra("phone", String.valueOf(phone));
-                startActivity(intent);
-                finish();
+                // Save to SharedPreferences
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                boolean success = editor
+                        .putString("username", usern)
+                        .putBoolean("islogged", true)
+                        .commit();
+
+                // Go to Dashboard
+                goDashboard();
 
             } else {
                 Toast.makeText(this, "Datos incorrectos.", Toast.LENGTH_SHORT).show();
@@ -118,6 +119,12 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    private  void goDashboard(){
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
 }

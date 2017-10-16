@@ -1,14 +1,18 @@
 package layout;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
+import com.ftinc.scoop.Scoop;
 import com.tecsup.ricardobq.mypersonalapp.R;
 
 /**
@@ -30,6 +34,11 @@ public class ConfigFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private static final String PREFERENCE_NAME = "ScoopSettingsActivityTest_prefs";
+
+    private SharedPreferences mSharedPrefs;
+
 
     public ConfigFragment() {
         // Required empty public constructor
@@ -67,6 +76,30 @@ public class ConfigFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_config, container, false);
+
+        Button button = (Button) view.findViewById(R.id.button);
+
+        Scoop.waffleCone()
+                .addFlavor("Default", R.style.Theme_Scoop, true)
+                .addFlavor("Light", R.style.Theme_Scoop_Light)
+                .addDayNightFlavor("DayNight", R.style.Theme_Scoop_DayNight)
+                .addFlavor("Alternate 1", R.style.Theme_Scoop_Alt1)
+                .addFlavor("Alternate 2", R.style.Theme_Scoop_Alt2, R.style.Theme_Scoop_Alt2)
+                .setSharedPreferences(PreferenceManager.getDefaultSharedPreferences(view.getContext()))
+                .initialize();
+
+        button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            //On click function
+            public void onClick(View view) {
+                //Create the intent to start another activity
+                // Apply Scoop to the activity
+
+                Scoop.getInstance().choose(Scoop.getInstance().getFlavors().get(0));
+                Scoop.getInstance().apply(getActivity());
+
+            }
+        });
 
         return view;
     }
